@@ -12,9 +12,7 @@ public class Docente extends Utente{
     }
 
     //Metodi
-    public void visualizzaProprioOrario(){
 
-    }
 
     public void richiediSpostamento(){
 

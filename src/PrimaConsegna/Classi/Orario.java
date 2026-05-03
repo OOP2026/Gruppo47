@@ -9,10 +9,10 @@ public class Orario {
         this.lezioni = new ArrayList<>();
     }
 
+    //Get e Set
     public List<Lezione> getLezioni() {
         return lezioni;
     }
-
     public void setLezioni(List<Lezione> lezioni) {
         this.lezioni = lezioni;
     }
@@ -45,5 +45,27 @@ public class Orario {
 
     public void aggiungiLezione(Lezione l) {
         this.lezioni.add(l);
+    }
+
+    //Funziona per filtrare le lezioni per gli studenti
+    public List<Lezione> getLezioniPerAnno(AnnoCorso anno){
+        List<Lezione> filtrate = new ArrayList<>();
+        for (Lezione l : lezioni) {
+            if(l.getInsegnamento().getAnno().equals(anno)){
+                filtrate.add(l);
+            }
+        }
+        return  filtrate;
+    }
+
+    //Funzione per filtrare le lezioni per docenti
+    public List<Lezione> getLezioniPerDocente(Docente d){
+        List<Lezione> filtrate = new ArrayList<>();
+        for(Lezione l : lezioni){
+            if(l.getInsegnamento().getDocenteTitolare().equals(d)){
+                filtrate.add(l);
+            }
+        }
+        return filtrate;
     }
 }
