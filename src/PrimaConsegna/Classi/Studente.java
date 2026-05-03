@@ -7,7 +7,7 @@ public class Studente extends Utente {
     private Orario orarioGenerale;
     private AnnoCorso annoS;
 
-    public Studente(String nome, String cognome, String mail, String password, String login, Orario orario) {
+    public Studente(String nome, String cognome, String mail, String password, String login,AnnoCorso annoS, String matricola, Orario orario) {
         super(nome, cognome, mail, password, login);
         this.matricola = matricola;
         this.orarioGenerale = orario;
@@ -55,4 +55,4 @@ public class Studente extends Utente {
             }
         }
     }
-}    
+}

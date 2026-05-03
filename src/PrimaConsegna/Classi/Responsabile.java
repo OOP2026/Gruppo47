@@ -13,7 +13,7 @@ public class Responsabile extends Docente{
         super(nome, cognome, mail, password, login, orario);
         this.elencoAule = new ArrayList<>();
         this.elencoInsegnamenti = new ArrayList<>();
-        //this.orarioGenerale = orario;
+        this.orarioGenerale = orario;
     }
 
     //Get e Set

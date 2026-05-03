@@ -6,6 +6,11 @@ import Classi.Orario;
 import Classi.Responsabile;
 import Classi.AnnoCorso;
 import Classi.GiornoSettimana;
+import Classi.Studente;
+import Classi.Docente;
+import Classi.Utente;
+import Classi.RichiestaSpostamento;
+import Classi.StatoRichiesta;
 
 import java.time.LocalTime;
 
@@ -58,5 +63,21 @@ public class Main {
         }
 
         //TEST metodi di visualizzazione orario
+        // 1. Creiamo uno studente del primo anno collegato all'orario generale
+        Studente stud = new Studente("Mario", "Rossi", "mario@stud.it", "12345", "mariolino", AnnoCorso.I,"N86005286", orarioGenerale);
+
+        // 2. Creiamo una lezione per il SECONDO anno (per testare il filtro)
+        resp.definisciInsegnamento("Analisi 2", 9, AnnoCorso.II, resp);
+        Insegnamento analisi2 = resp.getelencoInsegnamenti().get(1); // Il secondo insegnamento
+        resp.creaLezione(analisi2, GiornoSettimana.martedi, LocalTime.of(14, 0), LocalTime.of(16, 0), aula1);
+
+        // 3. TEST VISUALIZZAZIONE
+        System.out.println("\n--- TEST VISUALIZZAZIONE STUDENTE ---");
+        stud.visualizzaOrarioCorso();
+        // Lo studente dovrebbe vedere solo Algebra (Anno I) e NON Analisi 2 (Anno II).
+
+        System.out.println("\n--- TEST VISUALIZZAZIONE DOCENTE ---");
+        resp.visualizzaOrario();
+        // Il docente dovrebbe vedere sia Algebra che Analisi 2 (perché è titolare di entrambi).
     }
 }
