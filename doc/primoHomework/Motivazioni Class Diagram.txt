@@ -1,0 +1,13 @@
+
+Motivazioni scelte Class Diagram:
+Per gestire gli utenti ho scelto di partire da una classe astratta 'Utente' e creare le specializzazioni 'Docente' e 'Studente', per sfruttare le caratteristiche in comune. Stesso discorso per la classe 'Responsabile' fatta come specializzazione di 'Docente', poiché si tratta di un docente con permessi in più.
+La classe 'Lezione' è in relazione con 'Insegnamento' e 'Aula', poiché può esistere solo nel momento in cui vengono assegnati un insegnamento e un' aula:
+-Lezione:Aula(N:1): ogni lezione è associata a una singola aula, un'aula può ospitare più lezioni;
+-Lezione:Insegnamento(N:1): un insegnamento si articola in una o più lezioni;
+-Orario:Lezione: orario è un'aggregazione di tutte le lezioni presenti;
+-Docente:Insegnamento(1:N): un docente è titolare di uno o più insegnamenti, mentre un insegnamento può avere solo un docente titolare;
+
+'RichiestaSpostamento' serve a gestire le richieste fatte dai docenti, ed è in relazione con 'Lezione' perché è riferita ad esse.
+'Responsabile' gestisce tutto il sistema, infatti ha tutti i metodi che permettono di apportare modifiche e gestire gli elementi già presenti nel sistema.
+Le enumerazioni permettono di prevenire errori di inserimento da parte degli utenti.
+'Orario', in quanto contenitore di lezioni, ha il ruolo di controllore sull'inserimento e sulle modifiche delle lezioni.
