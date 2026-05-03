@@ -20,7 +20,7 @@ public class Main {
         Orario orarioGenerale = new Orario();
 
         //Creazione Responsabile
-        Responsabile resp = new Responsabile("Sara", "Zattera", "sarazattera8@gmail.com", "180226", "Sarina", orarioGenerale);
+        Responsabile resp = new Responsabile("Sara", "Zattera", "sarazattera8@gmail.com", "180226", "Scimmietta", orarioGenerale);
 
         //Test metodo inserisciAula
         resp.inserisciAula("A1");

@@ -2,6 +2,7 @@ package Classi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalTime;
 
 public class Docente extends Utente{
     private List<Insegnamento> insegnamenti;
@@ -31,8 +32,10 @@ public class Docente extends Utente{
         }
     }
 
-    public void richiediSpostamento(){
-
+    public void richiediSpostamento(Lezione lezione, GiornoSettimana nuovoGiorno, LocalTime nuovoInizio, LocalTime nuovaFine){
+        RichiestaSpostamento richiesta = new RichiestaSpostamento(nuovoGiorno, nuovoInizio, nuovaFine, StatoRichiesta.in_attesa, lezione);
+        orarioGenerale.aggiungiRichiesta(richiesta);
+        System.out.println("Richiesta di spostamento inviata per: "+lezione.getInsegnamento().getNome());
     }
 
     public void aggiungiInsegnamento(Insegnamento insegnamento){

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Orario {
     private List<Lezione> lezioni;
+    private List<RichiestaSpostamento> richiesteSpostamento = new  ArrayList<>();
 
     public Orario() {
         this.lezioni = new ArrayList<>();
@@ -67,5 +68,17 @@ public class Orario {
             }
         }
         return filtrate;
+    }
+
+    public void aggiungiRichiesta(RichiestaSpostamento r){
+        richiesteSpostamento.add(r);
+    }
+
+    public List<RichiestaSpostamento> getRichiesteSpostamento() {
+        return richiesteSpostamento;
+    }
+
+    public void rimuoviLezione(Lezione l) {
+        this.lezioni.remove(l);
     }
 }
