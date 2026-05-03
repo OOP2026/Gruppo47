@@ -11,3 +11,5 @@ La classe 'Lezione' è in relazione con 'Insegnamento' e 'Aula', poiché può es
 'Responsabile' gestisce tutto il sistema, infatti ha tutti i metodi che permettono di apportare modifiche e gestire gli elementi già presenti nel sistema.
 Le enumerazioni permettono di prevenire errori di inserimento da parte degli utenti.
 'Orario', in quanto contenitore di lezioni, ha il ruolo di controllore sull'inserimento e sulle modifiche delle lezioni.
+
+Il codice è presente in src > PrimaConsegna
