@@ -11,7 +11,7 @@ public class RichiestaSpostamento {
     public RichiestaSpostamento(GiornoSettimana giornoProposto, LocalTime oraInizioProposta,LocalTime oraFineProposta, StatoRichiesta stato, Lezione lezioneRiferimento) {
         this.giornoProposto = giornoProposto;
         this.oraInizioProposta = oraInizioProposta;
-
+        this.oraFineProposta = oraFineProposta;
         this.stato = StatoRichiesta.in_attesa;
         this.lezione = lezioneRiferimento;
     }
