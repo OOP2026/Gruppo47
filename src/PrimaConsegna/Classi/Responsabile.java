@@ -10,10 +10,10 @@ public class Responsabile extends Docente{
     private Orario orarioGenerale;
 
     public Responsabile(String nome, String cognome, String mail, String password, String login, Orario orario){
-        super(nome, cognome, mail, password, login);
+        super(nome, cognome, mail, password, login, orario);
         this.elencoAule = new ArrayList<>();
         this.elencoInsegnamenti = new ArrayList<>();
-        this.orarioGenerale = orario;
+        //this.orarioGenerale = orario;
     }
 
     //Get e Set

@@ -56,5 +56,7 @@ public class Main {
                     " [" + l.getGiorno() + " " + l.getOraInizio() + "-" + l.getOraFine() + "]");
 
         }
+
+        //TEST metodi di visualizzazione orario
     }
 }
