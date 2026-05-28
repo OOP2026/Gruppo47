@@ -15,11 +15,7 @@ public class GestioneOrarioController {
     }
 
     // ── USE CASE: Crea Lezione ───────────────────────────────────────────────
-
-    /**
-     * Tenta di creare una lezione.
-     * @return null se ha successo, oppure un messaggio di errore.
-     */
+    
     public String creaLezione(String nomeInsegnamento, String giornoStr,
                               String oraInizioStr, String oraFineStr, String nomeAula) {
         // Validazione input

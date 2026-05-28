@@ -16,10 +16,7 @@ public class RichiestaController {
 
     // ── USE CASE: Invia Richiesta di Spostamento (Docente) ───────────────────
 
-    /**
-     * Un docente invia una richiesta di spostamento per una propria lezione.
-     * @return null se ha successo, oppure un messaggio di errore.
-     */
+
     public String inviaRichiesta(Lezione lezione, String giornoStr,
                                  String oraInizioStr, String oraFineStr) {
         if (lezione == null) return "Seleziona una lezione da spostare.";
@@ -56,10 +53,7 @@ public class RichiestaController {
 
     // ── USE CASE: Gestisci Richiesta (Responsabile) ──────────────────────────
 
-    /**
-     * Il responsabile approva o rifiuta una richiesta di spostamento.
-     * @return messaggio descrittivo dell'esito.
-     */
+
     public String gestisciRichiesta(RichiestaSpostamento richiesta, boolean approva) {
         if (richiesta == null) return "Nessuna richiesta selezionata.";
         if (richiesta.getStato() != StatoRichiesta.in_attesa)
@@ -108,7 +102,7 @@ public class RichiestaController {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    /** Restituisce le lezioni del docente specificato, per la UI "Invia Richiesta" */
+
     public List<Lezione> getLezioniDocente(Docente docente) {
         return orario.getLezioniPerDocente(docente);
     }
