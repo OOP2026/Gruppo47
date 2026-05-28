@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.RichiestaController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class GestisciRichiestaPanel extends JPanel {
 
-    private RichiestaController controller;
+    private Controller controller;
     private MainFrame mainFrame;
 
     private JTable table;
@@ -21,7 +22,7 @@ public class GestisciRichiestaPanel extends JPanel {
             "Insegnamento", "Giorno orig.", "Orario orig.", "Giorno prop.", "Ora prop.", "Stato"
     };
 
-    public GestisciRichiestaPanel(RichiestaController controller, MainFrame mainFrame) {
+    public GestisciRichiestaPanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
         this.mainFrame  = mainFrame;
         setLayout(new BorderLayout());

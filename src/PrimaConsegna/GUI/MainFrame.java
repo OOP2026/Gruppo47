@@ -1,6 +1,6 @@
-package Boundary;
+package GUI;
 
-import Controller.*;
+import Controller.Controller;
 import Classi.*;
 
 import javax.swing.*;
@@ -25,11 +25,7 @@ public class MainFrame extends JFrame {
     public static final String CARD_STUDENTE     = "STUDENTE";
     public static final String CARD_RISORSE      = "RISORSE";
 
-    public MainFrame(GestioneOrarioController gestioneCtrl,
-                     RichiestaController richiestaCtrl,
-                     VisualizzaOrarioController visualizzaCtrl,
-                     Docente docenteCorrente,
-                     Studente studenteCorrente) {
+    public MainFrame(Controller controller, Docente docenteCorrente, Studente studenteCorrente) {
 
         setTitle("Gestione Orario");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,16 +50,16 @@ public class MainFrame extends JFrame {
         navPanel.add(btnStudente);
         add(navPanel, BorderLayout.NORTH);
 
-        // Area centrale
+        // Area centrale con CardLayout
         cardLayout   = new CardLayout();
         contentPanel = new JPanel(cardLayout);
 
-        orarioTablePanel       = new OrarioTablePanel(gestioneCtrl);
-        creaLezionePanel       = new CreaLezionePanel(gestioneCtrl, this);
-        inviaRichiestaPanel    = new InviaRichiestaPanel(richiestaCtrl, docenteCorrente, this);
-        gestisciRichiestePanel = new GestisciRichiestaPanel(richiestaCtrl, this);
-        studenteOrarioPanel    = new StudenteOrarioPanel(visualizzaCtrl, studenteCorrente);
-        gestioneRisorsePanel   = new GestioneRisorsePanel(gestioneCtrl, this);
+        orarioTablePanel       = new OrarioTablePanel(controller);
+        creaLezionePanel       = new CreaLezionePanel(controller, this);
+        inviaRichiestaPanel    = new InviaRichiestaPanel(controller, docenteCorrente, this);
+        gestisciRichiestePanel = new GestisciRichiestaPanel(controller, this);
+        studenteOrarioPanel    = new StudenteOrarioPanel(controller, studenteCorrente);
+        gestioneRisorsePanel   = new GestioneRisorsePanel(controller, this);
 
         contentPanel.add(orarioTablePanel,       CARD_ORARIO);
         contentPanel.add(creaLezionePanel,        CARD_CREA_LEZIONE);
@@ -74,7 +70,6 @@ public class MainFrame extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // Azioni bottoni navigazione
         btnOrario.addActionListener(e      -> showCard(CARD_ORARIO));
         btnCreaLezione.addActionListener(e -> showCard(CARD_CREA_LEZIONE));
         btnRisorse.addActionListener(e     -> showCard(CARD_RISORSE));

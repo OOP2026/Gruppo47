@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.RichiestaController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class InviaRichiestaPanel extends JPanel {
 
-    private RichiestaController controller;
+    private Controller controller;
     private Docente docenteCorrente;
     private MainFrame mainFrame;
 
@@ -20,7 +21,7 @@ public class InviaRichiestaPanel extends JPanel {
 
     private List<Lezione> lezioniDocente;
 
-    public InviaRichiestaPanel(RichiestaController controller, Docente docenteCorrente, MainFrame mainFrame) {
+    public InviaRichiestaPanel(Controller controller, Docente docenteCorrente, MainFrame mainFrame) {
         this.controller      = controller;
         this.docenteCorrente = docenteCorrente;
         this.mainFrame       = mainFrame;

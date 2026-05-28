@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.GestioneOrarioController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class OrarioTablePanel extends JPanel {
 
-    private GestioneOrarioController controller;
+    private Controller controller;
     private DefaultTableModel tableModel;
     private JComboBox<String> filtroAnnoBox;
 
@@ -18,7 +19,7 @@ public class OrarioTablePanel extends JPanel {
             "Giorno", "Inizio", "Fine", "Insegnamento", "Anno", "Docente", "Aula"
     };
 
-    public OrarioTablePanel(GestioneOrarioController controller) {
+    public OrarioTablePanel(Controller controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
 

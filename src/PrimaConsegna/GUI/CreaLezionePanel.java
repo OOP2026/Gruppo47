@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.GestioneOrarioController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -8,7 +9,7 @@ import java.awt.*;
 
 public class CreaLezionePanel extends JPanel {
 
-    private GestioneOrarioController controller;
+    private Controller controller;
     private MainFrame mainFrame;
 
     private JComboBox<String> insegnamentoBox;
@@ -17,7 +18,7 @@ public class CreaLezionePanel extends JPanel {
     private JTextField oraInizioField;
     private JTextField oraFineField;
 
-    public CreaLezionePanel(GestioneOrarioController controller, MainFrame mainFrame) {
+    public CreaLezionePanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
         this.mainFrame  = mainFrame;
         setLayout(new GridLayout(6, 2, 5, 5));

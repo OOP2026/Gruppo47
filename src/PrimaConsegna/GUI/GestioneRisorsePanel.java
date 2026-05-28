@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.GestioneOrarioController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class GestioneRisorsePanel extends JPanel {
 
-    private GestioneOrarioController controller;
+    private Controller controller;
     private MainFrame mainFrame;
 
     private JTextField nomeAulaField;
@@ -23,7 +24,7 @@ public class GestioneRisorsePanel extends JPanel {
 
     private List<Docente> docentiDisponibili;
 
-    public GestioneRisorsePanel(GestioneOrarioController controller, MainFrame mainFrame) {
+    public GestioneRisorsePanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
         this.mainFrame  = mainFrame;
         setLayout(new GridLayout(1, 2, 10, 0));

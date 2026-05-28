@@ -1,6 +1,7 @@
-package Boundary;
+package GUI;
+import Controller.Controller;
 
-import Controller.VisualizzaOrarioController;
+
 import Classi.*;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class StudenteOrarioPanel extends JPanel {
 
-    private VisualizzaOrarioController controller;
+    private Controller controller;
     private Studente studente;
     private DefaultTableModel tableModel;
 
@@ -18,7 +19,7 @@ public class StudenteOrarioPanel extends JPanel {
             "Giorno", "Inizio", "Fine", "Insegnamento", "Docente", "Aula"
     };
 
-    public StudenteOrarioPanel(VisualizzaOrarioController controller, Studente studente) {
+    public StudenteOrarioPanel(Controller controller, Studente studente) {
         this.controller = controller;
         this.studente   = studente;
         setLayout(new BorderLayout());
