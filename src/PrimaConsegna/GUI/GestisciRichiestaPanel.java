@@ -1,20 +1,23 @@
 package GUI;
+
 import Controller.Controller;
-
-
 import Classi.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.util.List;
 
-public class GestisciRichiestaPanel extends JPanel {
+public class GestisciRichiestaPanel {
 
+    // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
+    private JPanel mainPanel;
+    private JTable table;
+    private JButton approvaBtn;
+    private JButton rifiutaBtn;
+
+    // --- 2. VARIABILI DI LOGICA ---
     private Controller controller;
     private MainFrame mainFrame;
-
-    private JTable table;
     private DefaultTableModel tableModel;
     private List<RichiestaSpostamento> richiesteCorrente;
 
@@ -25,33 +28,29 @@ public class GestisciRichiestaPanel extends JPanel {
     public GestisciRichiestaPanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
         this.mainFrame  = mainFrame;
-        setLayout(new BorderLayout());
 
+        // --- INIZIALIZZAZIONE TABELLA ---
+        // Ricreo il tuo modello personalizzato non modificabile
         tableModel = new DefaultTableModel(COLONNE, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        // Assegno il modello alla tabella che il designer ha disegnato per me
+        table.setModel(tableModel);
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton approvaBtn = new JButton("Approva");
-        JButton rifiutaBtn = new JButton("Rifiuta");
-        bottomPanel.add(approvaBtn);
-        bottomPanel.add(rifiutaBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
-
+        // --- LISTENERS ---
         approvaBtn.addActionListener(e -> onGestisci(true));
         rifiutaBtn.addActionListener(e -> onGestisci(false));
     }
 
+    // --- 3. METODI ---
     private void onGestisci(boolean approva) {
         int row = table.getSelectedRow();
         if (row < 0) {
-            MainFrame.showError(this, "Seleziona una richiesta.");
+            MainFrame.showError(mainPanel, "Seleziona una richiesta."); // Aggiornato con mainPanel
             return;
         }
         String esito = controller.gestisciRichiesta(richiesteCorrente.get(row), approva);
-        MainFrame.showSuccess(this, esito);
+        MainFrame.showSuccess(mainPanel, esito); // Aggiornato con mainPanel
         refresh();
     }
 
@@ -68,5 +67,9 @@ public class GestisciRichiestaPanel extends JPanel {
                     r.getStato().name()
             });
         }
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }

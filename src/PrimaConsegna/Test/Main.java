@@ -13,13 +13,15 @@ public class Main {
 
     public static void main(String[] args) {
 
+
+
         // ── Entity ────────────────────────────────────────────────────────────
         Orario orarioGenerale = new Orario();
 
         Docente docRossi   = new Docente("Mario",  "Rossi",   "rossi@uni.it",   "pass", "mrossi",   orarioGenerale);
         Docente docBianchi = new Docente("Laura",  "Bianchi", "bianchi@uni.it", "pass", "lbianchi", orarioGenerale);
         Responsabile resp  = new Responsabile("Carlo", "Verdi", "verdi@uni.it", "admin", "cverdi",  orarioGenerale);
-
+        
         resp.inserisciAula("Aula A1");
         resp.inserisciAula("Aula B2");
         resp.inserisciAula("Lab Informatica");
@@ -55,10 +57,15 @@ public class Main {
         docenti.add(docBianchi);
         docenti.add(resp);
 
-        SwingUtilities.invokeLater(() -> {
-            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-            catch (Exception ignored) {}
+//        SwingUtilities.invokeLater(() -> {
+//            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+//            catch (Exception ignored) {}
+//
+//            MainFrame frame = new MainFrame(controller, docBianchi, studente);
+//            frame.setVisible(true);
+//        });
 
+        SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame(controller, docBianchi, studente);
             frame.setVisible(true);
         });

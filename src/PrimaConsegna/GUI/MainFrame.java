@@ -8,9 +8,18 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    private CardLayout cardLayout;
-    private JPanel contentPanel;
+    // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
+    private JPanel mainPanel; // Il contenitore radice
+    private JPanel contentPanel; // Il pannello vuoto al centro in cui ruoteremo le carte
+    private JButton btnOrario;
+    private JButton btnCreaLezione;
+    private JButton btnRisorse;
+    private JButton btnRichieste;
+    private JButton btnInviaReq;
+    private JButton btnStudente;
 
+    // --- 2. LE TUE VARIABILI LOGICHE ---
+    private CardLayout cardLayout;
     private OrarioTablePanel orarioTablePanel;
     private CreaLezionePanel creaLezionePanel;
     private InviaRichiestaPanel inviaRichiestaPanel;
@@ -27,33 +36,21 @@ public class MainFrame extends JFrame {
 
     public MainFrame(Controller controller, Docente docenteCorrente, Studente studenteCorrente) {
 
+        // --- CONFIGURAZIONE FINESTRA BASE ---
         setTitle("Gestione Orario");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
 
-        // Bottoni di navigazione in alto
-        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton btnOrario      = new JButton("Orario Generale");
-        JButton btnCreaLezione = new JButton("Crea Lezione");
-        JButton btnRisorse     = new JButton("Aule & Insegnamenti");
-        JButton btnRichieste   = new JButton("Gestisci Richieste");
-        JButton btnInviaReq    = new JButton("Invia Richiesta");
-        JButton btnStudente    = new JButton("Orario Studente");
+        // Imposto il pannello disegnato graficamente come contenuto della finestra!
+        setContentPane(mainPanel);
 
-        navPanel.add(btnOrario);
-        navPanel.add(btnCreaLezione);
-        navPanel.add(btnRisorse);
-        navPanel.add(btnRichieste);
-        navPanel.add(btnInviaReq);
-        navPanel.add(btnStudente);
-        add(navPanel, BorderLayout.NORTH);
+        // --- CONFIGURAZIONE CARD LAYOUT ---
+        // Applico il CardLayout al pannello centrale disegnato nel form
+        cardLayout = new CardLayout();
+        contentPanel.setLayout(cardLayout);
 
-        // Area centrale con CardLayout
-        cardLayout   = new CardLayout();
-        contentPanel = new JPanel(cardLayout);
-
+        // --- INIZIALIZZAZIONE DEI SOTTO-PANNELLI ---
         orarioTablePanel       = new OrarioTablePanel(controller);
         creaLezionePanel       = new CreaLezionePanel(controller, this);
         inviaRichiestaPanel    = new InviaRichiestaPanel(controller, docenteCorrente, this);
@@ -61,15 +58,15 @@ public class MainFrame extends JFrame {
         studenteOrarioPanel    = new StudenteOrarioPanel(controller, studenteCorrente);
         gestioneRisorsePanel   = new GestioneRisorsePanel(controller, this);
 
-        contentPanel.add(orarioTablePanel,       CARD_ORARIO);
-        contentPanel.add(creaLezionePanel,        CARD_CREA_LEZIONE);
-        contentPanel.add(inviaRichiestaPanel,     CARD_INVIA_REQ);
-        contentPanel.add(gestisciRichiestePanel,  CARD_GESTISCI_REQ);
-        contentPanel.add(studenteOrarioPanel,     CARD_STUDENTE);
-        contentPanel.add(gestioneRisorsePanel,    CARD_RISORSE);
+        // Aggiungo i sotto-pannelli estraendo la loro vista grafica tramite getMainPanel()
+        contentPanel.add(orarioTablePanel.getMainPanel(),       CARD_ORARIO);
+        contentPanel.add(creaLezionePanel.getMainPanel(),        CARD_CREA_LEZIONE);
+        contentPanel.add(inviaRichiestaPanel.getMainPanel(),     CARD_INVIA_REQ);
+        contentPanel.add(gestisciRichiestePanel.getMainPanel(),  CARD_GESTISCI_REQ);
+        contentPanel.add(studenteOrarioPanel.getMainPanel(),     CARD_STUDENTE);
+        contentPanel.add(gestioneRisorsePanel.getMainPanel(),    CARD_RISORSE);
 
-        add(contentPanel, BorderLayout.CENTER);
-
+        // --- LISTENERS ---
         btnOrario.addActionListener(e      -> showCard(CARD_ORARIO));
         btnCreaLezione.addActionListener(e -> showCard(CARD_CREA_LEZIONE));
         btnRisorse.addActionListener(e     -> showCard(CARD_RISORSE));
@@ -77,8 +74,11 @@ public class MainFrame extends JFrame {
         btnInviaReq.addActionListener(e    -> showCard(CARD_INVIA_REQ));
         btnStudente.addActionListener(e    -> showCard(CARD_STUDENTE));
 
+        // Mostro la prima carta
         showCard(CARD_ORARIO);
     }
+
+    // --- 3. I TUOI METODI DI UTILITA' INTATTI ---
 
     public void showCard(String cardName) {
         cardLayout.show(contentPanel, cardName);

@@ -1,47 +1,36 @@
 package GUI;
+
 import Controller.Controller;
-
-
 import Classi.*;
 
 import javax.swing.*;
-import java.awt.*;
 
-public class CreaLezionePanel extends JPanel {
+public class CreaLezionePanel {
 
-    private Controller controller;
-    private MainFrame mainFrame;
-
+    // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
+    // (Usa questi esatti nomi per la proprietà "field name" nel designer)
+    private JPanel mainPanel;
     private JComboBox<String> insegnamentoBox;
     private JComboBox<String> giornoBox;
     private JComboBox<String> aulaBox;
     private JTextField oraInizioField;
     private JTextField oraFineField;
+    private JButton creaBtn; // Promosso a variabile di classe per il binding!
+
+    // --- 2. VARIABILI DI LOGICA ---
+    private Controller controller;
+    private MainFrame mainFrame;
 
     public CreaLezionePanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
         this.mainFrame  = mainFrame;
-        setLayout(new GridLayout(6, 2, 5, 5));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        insegnamentoBox = new JComboBox<>();
-        giornoBox = new JComboBox<>();
-        for (GiornoSettimana g : controller.getGiorni())
+        // Popolamento iniziale dei giorni (Tenuto)
+        for (GiornoSettimana g : controller.getGiorni()) {
             giornoBox.addItem(g.name());
-        aulaBox = new JComboBox<>();
-        oraInizioField = new JTextField("09:00");
-        oraFineField   = new JTextField("11:00");
+        }
 
-        add(new JLabel("Insegnamento:"));  add(insegnamentoBox);
-        add(new JLabel("Giorno:"));        add(giornoBox);
-        add(new JLabel("Ora inizio:"));    add(oraInizioField);
-        add(new JLabel("Ora fine:"));      add(oraFineField);
-        add(new JLabel("Aula:"));          add(aulaBox);
-
-        JButton creaBtn = new JButton("Crea Lezione");
-        add(new JLabel());
-        add(creaBtn);
-
+        // Listener del bottone (Tenuto)
         creaBtn.addActionListener(e -> {
             String errore = controller.creaLezione(
                     (String) insegnamentoBox.getSelectedItem(),
@@ -51,13 +40,16 @@ public class CreaLezionePanel extends JPanel {
                     (String) aulaBox.getSelectedItem()
             );
             if (errore != null) {
-                MainFrame.showError(this, errore);
+                // Nota: sostituito "this" con "mainPanel"
+                MainFrame.showError(mainPanel, errore);
             } else {
-                MainFrame.showSuccess(this, "Lezione creata con successo!");
+                MainFrame.showSuccess(mainPanel, "Lezione creata con successo!");
                 mainFrame.showCard(MainFrame.CARD_ORARIO);
             }
         });
     }
+
+    // --- 3. METODI (Tenuti) ---
 
     public void refresh() {
         insegnamentoBox.removeAllItems();
@@ -67,5 +59,10 @@ public class CreaLezionePanel extends JPanel {
         aulaBox.removeAllItems();
         for (Aula a : controller.getAule())
             aulaBox.addItem(a.getNome());
+    }
+
+    // Metodo per recuperare la vista
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }

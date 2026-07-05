@@ -1,16 +1,19 @@
 package GUI;
+
 import Controller.Controller;
-
-
 import Classi.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.util.List;
 
-public class StudenteOrarioPanel extends JPanel {
+public class StudenteOrarioPanel {
 
+    // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
+    private JPanel mainPanel;
+    private JTable table;
+
+    // --- 2. VARIABILI DI LOGICA ---
     private Controller controller;
     private Studente studente;
     private DefaultTableModel tableModel;
@@ -22,15 +25,16 @@ public class StudenteOrarioPanel extends JPanel {
     public StudenteOrarioPanel(Controller controller, Studente studente) {
         this.controller = controller;
         this.studente   = studente;
-        setLayout(new BorderLayout());
 
+        // --- INIZIALIZZAZIONE TABELLA ---
         tableModel = new DefaultTableModel(COLONNE, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        JTable table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        // Assegno il modello alla tabella che hai disegnato graficamente
+        table.setModel(tableModel);
     }
 
+    // --- 3. METODO REFRESH ---
     public void refresh() {
         tableModel.setRowCount(0);
         if (studente == null) return;
@@ -46,5 +50,10 @@ public class StudenteOrarioPanel extends JPanel {
                     l.getAula().getNome()
             });
         }
+    }
+
+    // Metodo per recuperare la vista
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }

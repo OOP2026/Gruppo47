@@ -1,53 +1,44 @@
 package GUI;
+
 import Controller.Controller;
-
-
 import Classi.*;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
-public class InviaRichiestaPanel extends JPanel {
+public class InviaRichiestaPanel {
 
-    private Controller controller;
-    private Docente docenteCorrente;
-    private MainFrame mainFrame;
-
+    // --- 1. COMPONENTI CREATI DAL DESIGNER ---
+    // (Nel .form imposta il campo "field name" con questi esatti nomi)
+    private JPanel mainPanel; // Il pannello base su cui trascini tutto
     private JComboBox<String> lezioneBox;
     private JComboBox<String> giornoBox;
     private JTextField oraInizioField;
     private JTextField oraFineField;
+    private JButton inviaBtn;
 
+    // --- 2. LE TUE VARIABILI LOGICHE ---
+    private Controller controller;
+    private Docente docenteCorrente;
+    private MainFrame mainFrame;
     private List<Lezione> lezioniDocente;
 
     public InviaRichiestaPanel(Controller controller, Docente docenteCorrente, MainFrame mainFrame) {
         this.controller      = controller;
         this.docenteCorrente = docenteCorrente;
         this.mainFrame       = mainFrame;
-        setLayout(new GridLayout(5, 2, 5, 5));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        lezioneBox     = new JComboBox<>();
-        giornoBox      = new JComboBox<>();
-        for (GiornoSettimana g : controller.getGiorni())
+        // Popolamento dinamico del giorno (intatto!)
+        for (GiornoSettimana g : controller.getGiorni()) {
             giornoBox.addItem(g.name());
-        oraInizioField = new JTextField("09:00");
-        oraFineField   = new JTextField("11:00");
+        }
 
-        add(new JLabel("Lezione da spostare:")); add(lezioneBox);
-        add(new JLabel("Nuovo giorno:"));        add(giornoBox);
-        add(new JLabel("Nuova ora inizio:"));    add(oraInizioField);
-        add(new JLabel("Nuova ora fine:"));      add(oraFineField);
-
-        JButton inviaBtn = new JButton("Invia Richiesta");
-        add(new JLabel());
-        add(inviaBtn);
-
+        // Il tuo Listener (intatto!)
         inviaBtn.addActionListener(e -> {
             int idx = lezioneBox.getSelectedIndex();
             if (idx < 0 || lezioniDocente == null || idx >= lezioniDocente.size()) {
-                MainFrame.showError(this, "Seleziona una lezione.");
+                // Nota: uso mainPanel invece di "this" per mostrare l'errore
+                MainFrame.showError(mainPanel, "Seleziona una lezione.");
                 return;
             }
             String errore = controller.inviaRichiesta(
@@ -56,16 +47,22 @@ public class InviaRichiestaPanel extends JPanel {
                     oraInizioField.getText().trim(),
                     oraFineField.getText().trim()
             );
-            if (errore != null) MainFrame.showError(this, errore);
-            else MainFrame.showSuccess(this, "Richiesta inviata.");
+            if (errore != null) MainFrame.showError(mainPanel, errore);
+            else MainFrame.showSuccess(mainPanel, "Richiesta inviata.");
         });
     }
 
+    // Il tuo metodo (intatto!)
     public void refresh() {
         lezioneBox.removeAllItems();
         lezioniDocente = controller.getLezioniDocente(docenteCorrente);
         for (Lezione l : lezioniDocente)
             lezioneBox.addItem(l.getGiorno() + " " + l.getOraInizio() + "-" + l.getOraFine()
                     + " | " + l.getInsegnamento().getNome());
+    }
+
+    // METODO NUOVO: Serve a restituire il pannello grafico a chi lo richiede (es. il MainFrame)
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }
