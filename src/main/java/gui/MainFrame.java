@@ -1,10 +1,9 @@
-package GUI;
-
-import Controller.Controller;
-import Classi.*;
+package gui;
 
 import javax.swing.*;
 import java.awt.*;
+import controller.Controller;
+import model.*;
 
 public class MainFrame extends JFrame {
 
@@ -34,7 +33,7 @@ public class MainFrame extends JFrame {
     public static final String CARD_STUDENTE     = "STUDENTE";
     public static final String CARD_RISORSE      = "RISORSE";
 
-    public MainFrame(Controller controller, Docente docenteCorrente, Studente studenteCorrente) {
+    public MainFrame(Controller controller, Utente utenteLoggato) {
 
         // --- CONFIGURAZIONE FINESTRA BASE ---
         setTitle("Gestione Orario");
@@ -76,6 +75,8 @@ public class MainFrame extends JFrame {
 
         // Mostro la prima carta
         showCard(CARD_ORARIO);
+
+        impostaPermessi(utenteLoggato);
     }
 
     // --- 3. I TUOI METODI DI UTILITA' INTATTI ---
@@ -98,5 +99,31 @@ public class MainFrame extends JFrame {
 
     public static void showSuccess(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "OK", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void impostaPermessi(Utente u) {
+        // 1. Prima nascondiamo tutto a tutti
+        btnCreaLezione.setVisible(false);
+        btnRisorse.setVisible(false);
+        btnRichieste.setVisible(false);
+        btnInviaReq.setVisible(false);
+        btnStudente.setVisible(false);
+
+        // 2. Poi diamo i poteri in base al ruolo
+        if (u instanceof Responsabile) {
+            btnCreaLezione.setVisible(true);
+            btnRisorse.setVisible(true);
+            btnRichieste.setVisible(true);
+            btnInviaReq.setVisible(true);
+            showCard(CARD_RISORSE); // Il prof parte vedendo le Risorse
+
+        } else if (u instanceof Docente) {
+            btnInviaReq.setVisible(true);
+            showCard(CARD_ORARIO); // Il docente parte vedendo l'Orario generale
+
+        } else if (u instanceof Studente) {
+            btnStudente.setVisible(true);
+            showCard(CARD_STUDENTE); // Lo studente parte vedendo il suo orario
+        }
     }
 }

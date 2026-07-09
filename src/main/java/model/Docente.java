@@ -1,8 +1,9 @@
-package Classi;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalTime;
+
 
 public class Docente extends Utente{
     private List<Insegnamento> insegnamenti;

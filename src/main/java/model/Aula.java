@@ -1,4 +1,4 @@
-package Classi;
+package model;
 
 public class Aula {
 

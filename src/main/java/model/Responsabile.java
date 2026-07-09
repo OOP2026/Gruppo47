@@ -1,18 +1,21 @@
-package Classi;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalTime;
 
+
 public class Responsabile extends Docente{
     private List<Aula> elencoAule;
     private List<Insegnamento> elencoInsegnamenti;
+    private List<Docente> elencoDocenti;
     private Orario orarioGenerale;
 
     public Responsabile(String nome, String cognome, String mail, String password, String login, Orario orario){
         super(nome, cognome, mail, password, login, orario);
         this.elencoAule = new ArrayList<>();
         this.elencoInsegnamenti = new ArrayList<>();
+        this.elencoDocenti = new ArrayList<>();
         this.orarioGenerale = orario;
     }
 
@@ -30,6 +33,14 @@ public class Responsabile extends Docente{
     public void setelencoInsegnamenti(List<Insegnamento> elencoInsegnamenti){
         this.elencoInsegnamenti = elencoInsegnamenti;
     }
+
+    public List<Docente> getelencoDocenti(){
+        return this.elencoDocenti;
+    }
+    public void aggiungiDocente(Docente d){
+        this.elencoDocenti.add(d);
+    }
+
 
     //Metodi
     public void definisciInsegnamento(String nome, int CFU, AnnoCorso anno, Docente titolare){

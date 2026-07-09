@@ -1,10 +1,9 @@
-package GUI;
-
-import Controller.Controller;
-import Classi.*;
+package gui;
 
 import javax.swing.*;
 import java.util.List;
+import controller.Controller;
+import model.*;
 
 public class InviaRichiestaPanel {
 

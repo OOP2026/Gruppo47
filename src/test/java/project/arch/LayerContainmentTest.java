@@ -14,12 +14,12 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 public class LayerContainmentTest {
     @ArchTest
     public static final ArchRule controllers_reside_in_the_controller_layer = classes()
-            .that().haveSimpleNameEndingWith("Controller")
+            .that().haveSimpleNameEndingWith("controller")
             .should().resideInAPackage("project.controller");
 
     @ArchTest
     public static final ArchRule controllers_only_reside_in_the_controller_layer = noClasses()
-            .that().haveSimpleNameNotEndingWith("Controller")
+            .that().haveSimpleNameNotEndingWith("controller")
             .should().resideInAPackage("project.controller");
 
     @ArchTest

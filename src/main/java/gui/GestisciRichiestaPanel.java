@@ -1,11 +1,10 @@
-package GUI;
-
-import Controller.Controller;
-import Classi.*;
+package gui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import controller.Controller;
+import model.*;
 
 public class GestisciRichiestaPanel {
 

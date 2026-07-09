@@ -1,9 +1,8 @@
-package GUI;
-
-import Controller.Controller;
-import Classi.*;
+package gui;
 
 import javax.swing.*;
+import controller.Controller;
+import model.*;
 
 public class CreaLezionePanel {
 

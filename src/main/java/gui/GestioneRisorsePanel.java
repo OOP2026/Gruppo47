@@ -1,10 +1,9 @@
-package GUI;
-
-import Controller.Controller;
-import Classi.*;
+package gui;
 
 import javax.swing.*;
 import java.util.List;
+import controller.Controller;
+import model.*;
 
 public class GestioneRisorsePanel {
 
@@ -37,7 +36,7 @@ public class GestioneRisorsePanel {
 
     public GestioneRisorsePanel(Controller controller, MainFrame mainFrame) {
         this.controller = controller;
-        this.mainFrame  = mainFrame;
+        this.mainFrame = mainFrame;
 
         // --- INIZIALIZZAZIONE MODELLI LISTE ---
         aulaListModel = new DefaultListModel<>();
@@ -55,7 +54,7 @@ public class GestioneRisorsePanel {
         // Listener aggiunta Aula
         aggiungiAulaBtn.addActionListener(e -> {
             String err = controller.aggiungiAula(nomeAulaField.getText().trim());
-            if (err != null) MainFrame.showError(mainPanel, err); // Sostituito this
+            if (err != null) MainFrame.showError(mainPanel, err);
             else {
                 nomeAulaField.setText("");
                 refresh();
@@ -105,6 +104,14 @@ public class GestioneRisorsePanel {
         insListModel.clear();
         for (Insegnamento i : controller.getInsegnamenti())
             insListModel.addElement(i.getNome() + " (" + i.getCFU() + " CFU, " + i.getAnno() + ")");
+
+        docentiDisponibili = controller.getDocenti();
+        docenteBox.removeAllItems();
+        if (docentiDisponibili != null) {
+            for (Docente d : docentiDisponibili) {
+                docenteBox.addItem(d.getNome() + " " + d.getCognome());
+            }
+        }
     }
 
     public JPanel getMainPanel() {

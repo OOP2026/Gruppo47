@@ -1,13 +1,10 @@
 package Test;
 
-import GUI.*;
-import Controller.Controller;
-import Classi.*;
-
 import javax.swing.*;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import model.*;
+import controller.Controller;
+import gui.*;
 
 public class Main {
 
@@ -21,7 +18,7 @@ public class Main {
         Docente docRossi   = new Docente("Mario",  "Rossi",   "rossi@uni.it",   "pass", "mrossi",   orarioGenerale);
         Docente docBianchi = new Docente("Laura",  "Bianchi", "bianchi@uni.it", "pass", "lbianchi", orarioGenerale);
         Responsabile resp  = new Responsabile("Carlo", "Verdi", "verdi@uni.it", "admin", "cverdi",  orarioGenerale);
-        
+
         resp.inserisciAula("Aula A1");
         resp.inserisciAula("Aula B2");
         resp.inserisciAula("Lab Informatica");
@@ -48,22 +45,17 @@ public class Main {
         Studente studente = new Studente("Giulia", "Ferrari", "ferrari@stud.it",
                 "pass", "gferrari", AnnoCorso.I, "123456", orarioGenerale);
 
+
+        // NUOVO: Passiamo i docenti all'oggetto Responsabile
+        resp.aggiungiDocente(docRossi);
+        resp.aggiungiDocente(docBianchi);
+        resp.aggiungiDocente(resp); // Anche il responsabile stesso è un docente
+
         // ── Control ───────────────────────────────────────────────────────────
         Controller controller = new Controller(orarioGenerale, resp);
 
         // ── Boundary ──────────────────────────────────────────────────────────
-        List<Docente> docenti = new ArrayList<>();
-        docenti.add(docRossi);
-        docenti.add(docBianchi);
-        docenti.add(resp);
-
-//        SwingUtilities.invokeLater(() -> {
-//            try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-//            catch (Exception ignored) {}
-//
-//            MainFrame frame = new MainFrame(controller, docBianchi, studente);
-//            frame.setVisible(true);
-//        });
+        // NOTA: Ho eliminato la vecchia lista 'docenti' che avevi qui perché ora è dentro 'resp'
 
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame(controller, docBianchi, studente);
