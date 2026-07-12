@@ -4,17 +4,25 @@ import model.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import dao.UtenteDAO;
+import implementazioneDao.UtentePostgresDao;
+import dao.DatiDAO;
+import implementazioneDao.DatiPostgresDao;
 
 public class Controller {
 
 	private Orario orario;
 	private Responsabile responsabile;
-	private List<Utente> utentiRegistrati;
+	//private List<Utente> utentiRegistrati;
+	private UtenteDAO utenteDao;
+	private DatiDAO datiDao;
 
 	public Controller(Orario orario, Responsabile responsabile) {
 		this.orario       = orario;
 		this.responsabile = responsabile;
-		this.utentiRegistrati = new ArrayList<Utente>();
+		//this.utentiRegistrati = new ArrayList<Utente>();
+		this.utenteDao = new UtentePostgresDao();
+		this.datiDao = new DatiPostgresDao();
 	}
 
 	// ── Gestione Orario ───────────────────────────────────────────────────────
@@ -55,6 +63,7 @@ public class Controller {
 			return "Conflitto: aula occupata o docente già impegnato in quell'orario.";
 
 		orario.aggiungiLezione(nuova);
+		datiDao.salvaLezione(nuova);
 		return null;
 	}
 
@@ -65,6 +74,7 @@ public class Controller {
 			if (a.getNome().equalsIgnoreCase(nomeAula))
 				return "Aula già presente.";
 		responsabile.inserisciAula(nomeAula);
+		datiDao.salvaAula(new Aula(nomeAula));
 		return null;
 	}
 
@@ -73,6 +83,7 @@ public class Controller {
 		if (cfu <= 0)      return "I CFU devono essere positivi.";
 		if (titolare == null) return "Seleziona un docente titolare.";
 		responsabile.definisciInsegnamento(nome, cfu, anno, titolare);
+		datiDao.salvaInsegnamento(new Insegnamento(nome, cfu, anno, titolare));
 		return null;
 	}
 
@@ -120,7 +131,10 @@ public class Controller {
 			if (r.getLezione().equals(lezione) && r.getStato() == StatoRichiesta.in_attesa)
 				return "Esiste già una richiesta in attesa per questa lezione.";
 
-		orario.aggiungiRichiesta(new RichiestaSpostamento(giorno, inizio, fine, StatoRichiesta.in_attesa, lezione));
+		//orario.aggiungiRichiesta(new RichiestaSpostamento(giorno, inizio, fine, StatoRichiesta.in_attesa, lezione));
+		RichiestaSpostamento nuovaRichiesta = new RichiestaSpostamento(giorno, inizio, fine, StatoRichiesta.in_attesa, lezione);
+		orario.aggiungiRichiesta(nuovaRichiesta);
+		datiDao.salvaRichiesta(nuovaRichiesta);
 		return null;
 	}
 
@@ -144,18 +158,26 @@ public class Controller {
 			orario.rimuoviLezione(richiesta.getLezione());
 
 			if (!orario.haConflitti(ipotesi)) {
+				// 1. AGGIORNA LA LEZIONE SUL DB (Prima che i campi vengano modificati in RAM)
+				datiDao.aggiornaLezioneDopoSpostamento(richiesta.getLezione(), richiesta.getGiornoProposto(), richiesta.getOraProposta(), nuovaFine);
+
 				responsabile.modificaOrario(richiesta.getLezione(),
 						richiesta.getGiornoProposto(),
 						richiesta.getOraProposta(), nuovaFine);
+
 				richiesta.setStato(StatoRichiesta.approvata);
+				datiDao.aggiornaStatoRichiesta(richiesta); // 2. AGGIORNA LO STATO DELLA RICHIESTA
+
 				return "Richiesta approvata: orario aggiornato.";
 			} else {
 				orario.aggiungiLezione(richiesta.getLezione());
 				richiesta.setStato(StatoRichiesta.rifiutata);
+				datiDao.aggiornaStatoRichiesta(richiesta); // AGGIORNA SU DB
 				return "Impossibile approvare: genera conflitti. Richiesta rifiutata.";
 			}
 		} else {
 			richiesta.setStato(StatoRichiesta.rifiutata);
+			datiDao.aggiornaStatoRichiesta(richiesta); // AGGIORNA SU DB
 			return "Richiesta rifiutata.";
 		}
 	}
@@ -209,16 +231,38 @@ public class Controller {
 		return null;
 	}
 
-	public void registraUtente(Utente u) {
-		utentiRegistrati.add(u);
-	}
+//	public void registraUtente(Utente u) {
+//		utentiRegistrati.add(u);
+//	}
 
 	public Utente verificaLogin(String username, String password) {
-		for (Utente u : utentiRegistrati) {
-			if (u.login(username, password)) {
-				return u;
-			}
+		// Il Controller ora chiede semplicemente al DAO di fare il lavoro "sporco" nel DB
+		return utenteDao.verificaLogin(username, password);
+	}
+
+	public void caricaDatiAllAvvio() {
+		// 1. Estrae i docenti dal database
+		List<Docente> docenti = utenteDao.caricaTuttiDocenti();
+		for (Docente d : docenti) {
+			responsabile.aggiungiDocente(d);
 		}
-		return null;
+
+		// 2. Carica le Aule
+		List<Aula> aule = datiDao.caricaAule();
+		responsabile.setelencoAule(aule);
+
+		// 3. Carica gli Insegnamenti
+		List<Insegnamento> ins = datiDao.caricaInsegnamenti(docenti);
+		responsabile.setelencoInsegnamenti(ins);
+
+		// 4. Carica le Lezioni
+		List<Lezione> lez = datiDao.caricaLezioni(ins, aule);
+		orario.setLezioni(lez);
+
+		// 5. Carica le Richieste
+		List<RichiestaSpostamento> richieste = datiDao.caricaRichieste(lez);
+		for (RichiestaSpostamento r : richieste) {
+			orario.aggiungiRichiesta(r);
+		}
 	}
 }

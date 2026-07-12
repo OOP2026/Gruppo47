@@ -60,4 +60,19 @@ abstract public class Utente {
     public boolean login(String login, String password) {
         return ( login.equals(this.login) && password.equals(this.password));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        // Se sono fisicamente lo stesso oggetto in memoria, sono uguali
+        if (this == obj) return true;
+
+        // Se l'altro oggetto è nullo o appartiene a una classe diversa, non sono uguali
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        // Convertiamo l'oggetto generico in Utente
+        Utente altroUtente = (Utente) obj;
+
+        // Due utenti sono uguali se il loro "login" (la chiave primaria) è identico!
+        return this.login.equals(altroUtente.login);
+    }
 }

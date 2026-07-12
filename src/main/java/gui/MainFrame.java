@@ -45,13 +45,24 @@ public class MainFrame extends JFrame {
         setContentPane(mainPanel);
 
         // --- CONFIGURAZIONE CARD LAYOUT ---
-        // Applico il CardLayout al pannello centrale disegnato nel form
         cardLayout = new CardLayout();
         contentPanel.setLayout(cardLayout);
+
+        // --- CORREZIONE: RICAVIAMO IL TIPO DI UTENTE ---
+        Docente docenteCorrente = null;
+        if (utenteLoggato instanceof Docente) {
+            docenteCorrente = (Docente) utenteLoggato;
+        }
+
+        Studente studenteCorrente = null;
+        if (utenteLoggato instanceof Studente) {
+            studenteCorrente = (Studente) utenteLoggato;
+        }
 
         // --- INIZIALIZZAZIONE DEI SOTTO-PANNELLI ---
         orarioTablePanel       = new OrarioTablePanel(controller);
         creaLezionePanel       = new CreaLezionePanel(controller, this);
+        // Ora docenteCorrente e studenteCorrente esistono e hanno il valore corretto!
         inviaRichiestaPanel    = new InviaRichiestaPanel(controller, docenteCorrente, this);
         gestisciRichiestePanel = new GestisciRichiestaPanel(controller, this);
         studenteOrarioPanel    = new StudenteOrarioPanel(controller, studenteCorrente);
@@ -73,9 +84,7 @@ public class MainFrame extends JFrame {
         btnInviaReq.addActionListener(e    -> showCard(CARD_INVIA_REQ));
         btnStudente.addActionListener(e    -> showCard(CARD_STUDENTE));
 
-        // Mostro la prima carta
-        showCard(CARD_ORARIO);
-
+        // Imposta i permessi e mostra la carta corretta in base a chi si è loggato
         impostaPermessi(utenteLoggato);
     }
 
