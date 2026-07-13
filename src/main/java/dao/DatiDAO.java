@@ -22,4 +22,7 @@ public interface DatiDAO {
     List<RichiestaSpostamento> caricaRichieste(List<Lezione> lezioni);
     void aggiornaStatoRichiesta(RichiestaSpostamento richiesta);
     void aggiornaLezioneDopoSpostamento(Lezione vecchiaLezione, GiornoSettimana nuovoGiorno, LocalTime nuovoInizio, LocalTime nuovaFine);
+
+    // Eliminazione lezioni
+    void eliminaLezione(Lezione lezione);
 }

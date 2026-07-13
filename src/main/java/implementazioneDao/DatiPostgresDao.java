@@ -184,9 +184,10 @@ public class DatiPostgresDao implements DatiDAO {
     public List<RichiestaSpostamento> caricaRichieste(List<Lezione> lezioni) {
         List<RichiestaSpostamento> lista = new ArrayList<>();
         // Facciamo una JOIN per unire i dati della richiesta a quelli della lezione originale
-        String sql = "SELECT r.giorno_proposto, r.ora_inizio_proposta, r.ora_fine_proposta, r.stato, " +
-                "l.giorno, l.ora_inizio, l.ora_fine, l.insegnamento_nome, l.aula_nome " +
-                "FROM richiesta_spostamento r JOIN lezione l ON r.lezione_id = l.id";
+        String sql = "SELECT r.giorno_proposto, r.ora_inizio_proposta, r.ora_fine_proposta, r.stato,"
+                + " l.giorno, l.ora_inizio, l.ora_fine, l.insegnamento_nome, l.aula_nome"
+                + " FROM richiesta_spostamento r JOIN lezione l ON r.lezione_id = l.id"
+                + " WHERE r.stato = 'in_attesa'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -246,5 +247,20 @@ public class DatiPostgresDao implements DatiDAO {
             ps.setString(8, vecchia.getAula().getNome());
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public void eliminaLezione(Lezione lezione) {
+        String sql = "DELETE FROM lezione WHERE giorno=? AND ora_inizio=? AND ora_fine=? AND insegnamento_nome=? AND aula_nome=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, lezione.getGiorno().name());
+            ps.setTime(2, Time.valueOf(lezione.getOraInizio()));
+            ps.setTime(3, Time.valueOf(lezione.getOraFine()));
+            ps.setString(4, lezione.getInsegnamento().getNome());
+            ps.setString(5, lezione.getAula().getNome());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

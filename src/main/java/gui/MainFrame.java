@@ -61,6 +61,7 @@ public class MainFrame extends JFrame {
 
         // --- INIZIALIZZAZIONE DEI SOTTO-PANNELLI ---
         orarioTablePanel       = new OrarioTablePanel(controller);
+        orarioTablePanel.setUtenteLoggato(utenteLoggato);
         creaLezionePanel       = new CreaLezionePanel(controller, this);
         // Ora docenteCorrente e studenteCorrente esistono e hanno il valore corretto!
         inviaRichiestaPanel    = new InviaRichiestaPanel(controller, docenteCorrente, this);

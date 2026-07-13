@@ -8,19 +8,20 @@ import dao.UtenteDAO;
 import implementazioneDao.UtentePostgresDao;
 import dao.DatiDAO;
 import implementazioneDao.DatiPostgresDao;
+import java.util.Comparator;
 
 public class Controller {
 
 	private Orario orario;
-	private Responsabile responsabile;
-	//private List<Utente> utentiRegistrati;
+	// VARIABILE 'responsabile' ELIMINATA DEFINITIVAMENTE DA QUI
+	private List<Docente> docenti = new ArrayList<>();
+	private List<Aula> aule = new ArrayList<>();
+	private List<Insegnamento> insegnamenti = new ArrayList<>();
 	private UtenteDAO utenteDao;
 	private DatiDAO datiDao;
 
-	public Controller(Orario orario, Responsabile responsabile) {
-		this.orario       = orario;
-		this.responsabile = responsabile;
-		//this.utentiRegistrati = new ArrayList<Utente>();
+	public Controller(Orario orario) {
+		this.orario = orario;
 		this.utenteDao = new UtentePostgresDao();
 		this.datiDao = new DatiPostgresDao();
 	}
@@ -70,11 +71,16 @@ public class Controller {
 	public String aggiungiAula(String nomeAula) {
 		if (nomeAula == null || nomeAula.trim().isEmpty())
 			return "Il nome dell'aula non può essere vuoto.";
-		for (Aula a : responsabile.getelencoAule())
-			if (a.getNome().equalsIgnoreCase(nomeAula))
+
+		for (Aula a : this.aule) {
+			if (a.getNome().equalsIgnoreCase(nomeAula)) {
 				return "Aula già presente.";
-		responsabile.inserisciAula(nomeAula);
-		datiDao.salvaAula(new Aula(nomeAula));
+			}
+		}
+
+		Aula nuovaAula = new Aula(nomeAula);
+		this.aule.add(nuovaAula);
+		datiDao.salvaAula(nuovaAula);
 		return null;
 	}
 
@@ -82,8 +88,10 @@ public class Controller {
 		if (nome == null || nome.trim().isEmpty()) return "Il nome non può essere vuoto.";
 		if (cfu <= 0)      return "I CFU devono essere positivi.";
 		if (titolare == null) return "Seleziona un docente titolare.";
-		responsabile.definisciInsegnamento(nome, cfu, anno, titolare);
-		datiDao.salvaInsegnamento(new Insegnamento(nome, cfu, anno, titolare));
+
+		Insegnamento nuovoInsegnamento = new Insegnamento(nome, cfu, anno, titolare);
+		this.insegnamenti.add(nuovoInsegnamento);
+		datiDao.salvaInsegnamento(nuovoInsegnamento);
 		return null;
 	}
 
@@ -131,7 +139,6 @@ public class Controller {
 			if (r.getLezione().equals(lezione) && r.getStato() == StatoRichiesta.in_attesa)
 				return "Esiste già una richiesta in attesa per questa lezione.";
 
-		//orario.aggiungiRichiesta(new RichiestaSpostamento(giorno, inizio, fine, StatoRichiesta.in_attesa, lezione));
 		RichiestaSpostamento nuovaRichiesta = new RichiestaSpostamento(giorno, inizio, fine, StatoRichiesta.in_attesa, lezione);
 		orario.aggiungiRichiesta(nuovaRichiesta);
 		datiDao.salvaRichiesta(nuovaRichiesta);
@@ -158,26 +165,30 @@ public class Controller {
 			orario.rimuoviLezione(richiesta.getLezione());
 
 			if (!orario.haConflitti(ipotesi)) {
-				// 1. AGGIORNA LA LEZIONE SUL DB (Prima che i campi vengano modificati in RAM)
+				// 1. AGGIORNA LA LEZIONE SUL DB
 				datiDao.aggiornaLezioneDopoSpostamento(richiesta.getLezione(), richiesta.getGiornoProposto(), richiesta.getOraProposta(), nuovaFine);
 
-				responsabile.modificaOrario(richiesta.getLezione(),
-						richiesta.getGiornoProposto(),
-						richiesta.getOraProposta(), nuovaFine);
+				// 2. AGGIORNA LA LEZIONE IN RAM (Sostituisce il vecchio 'responsabile.modificaOrario')
+				richiesta.getLezione().setGiorno(richiesta.getGiornoProposto());
+				richiesta.getLezione().setOraInizio(richiesta.getOraProposta());
+				richiesta.getLezione().setOraFine(nuovaFine);
+				orario.aggiungiLezione(richiesta.getLezione());
 
+				// 3. AGGIORNA LO STATO DELLA RICHIESTA
 				richiesta.setStato(StatoRichiesta.approvata);
-				datiDao.aggiornaStatoRichiesta(richiesta); // 2. AGGIORNA LO STATO DELLA RICHIESTA
+				datiDao.aggiornaStatoRichiesta(richiesta);
 
 				return "Richiesta approvata: orario aggiornato.";
 			} else {
+				// Se c'è conflitto, rimettiamo la lezione dov'era prima
 				orario.aggiungiLezione(richiesta.getLezione());
 				richiesta.setStato(StatoRichiesta.rifiutata);
-				datiDao.aggiornaStatoRichiesta(richiesta); // AGGIORNA SU DB
+				datiDao.aggiornaStatoRichiesta(richiesta);
 				return "Impossibile approvare: genera conflitti. Richiesta rifiutata.";
 			}
 		} else {
 			richiesta.setStato(StatoRichiesta.rifiutata);
-			datiDao.aggiornaStatoRichiesta(richiesta); // AGGIORNA SU DB
+			datiDao.aggiornaStatoRichiesta(richiesta);
 			return "Richiesta rifiutata.";
 		}
 	}
@@ -196,15 +207,15 @@ public class Controller {
 	// ── Dati di supporto per le Boundary ─────────────────────────────────────
 
 	public List<Aula> getAule() {
-		return responsabile.getelencoAule();
+		return this.aule;
 	}
 
 	public List<Insegnamento> getInsegnamenti() {
-		return responsabile.getelencoInsegnamenti();
+		return this.insegnamenti;
 	}
 
 	public List<Docente> getDocenti() {
-		return responsabile.getelencoDocenti();
+		return this.docenti;
 	}
 
 	public GiornoSettimana[] getGiorni() {
@@ -215,54 +226,68 @@ public class Controller {
 		return AnnoCorso.values();
 	}
 
-
-
 	// ── Helper privati ────────────────────────────────────────────────────────
 
-	private Insegnamento trovaInsegnamento(String nome) {
-		for (Insegnamento i : responsabile.getelencoInsegnamenti())
-			if (i.getNome().equals(nome)) return i;
+	public Insegnamento trovaInsegnamento(String nome) {
+		for (Insegnamento i : this.insegnamenti) {
+			if (i.getNome().equalsIgnoreCase(nome)) {
+				return i;
+			}
+		}
 		return null;
 	}
 
-	private Aula trovaAula(String nome) {
-		for (Aula a : responsabile.getelencoAule())
-			if (a.getNome().equals(nome)) return a;
+	public Aula trovaAula(String nome) {
+		for (Aula a : this.aule) {
+			if (a.getNome().equalsIgnoreCase(nome)) {
+				return a;
+			}
+		}
 		return null;
 	}
-
-//	public void registraUtente(Utente u) {
-//		utentiRegistrati.add(u);
-//	}
 
 	public Utente verificaLogin(String username, String password) {
-		// Il Controller ora chiede semplicemente al DAO di fare il lavoro "sporco" nel DB
 		return utenteDao.verificaLogin(username, password);
 	}
 
 	public void caricaDatiAllAvvio() {
-		// 1. Estrae i docenti dal database
-		List<Docente> docenti = utenteDao.caricaTuttiDocenti();
-		for (Docente d : docenti) {
-			responsabile.aggiungiDocente(d);
-		}
+		this.docenti = utenteDao.caricaTuttiDocenti();
+		this.aule = datiDao.caricaAule();
+		this.insegnamenti = datiDao.caricaInsegnamenti(this.docenti);
 
-		// 2. Carica le Aule
-		List<Aula> aule = datiDao.caricaAule();
-		responsabile.setelencoAule(aule);
-
-		// 3. Carica gli Insegnamenti
-		List<Insegnamento> ins = datiDao.caricaInsegnamenti(docenti);
-		responsabile.setelencoInsegnamenti(ins);
-
-		// 4. Carica le Lezioni
-		List<Lezione> lez = datiDao.caricaLezioni(ins, aule);
+		List<Lezione> lez = datiDao.caricaLezioni(this.insegnamenti, this.aule);
 		orario.setLezioni(lez);
 
-		// 5. Carica le Richieste
 		List<RichiestaSpostamento> richieste = datiDao.caricaRichieste(lez);
 		for (RichiestaSpostamento r : richieste) {
 			orario.aggiungiRichiesta(r);
 		}
+	}
+
+	public void eliminaLezione(Lezione lezione) {
+		orario.rimuoviLezione(lezione);
+		datiDao.eliminaLezione(lezione);
+	}
+
+	public List<Lezione> ordinaLezioni(List<Lezione> listaDaOrdinare) {
+		List<Lezione> ordinate = new ArrayList<>(listaDaOrdinare);
+
+		ordinate.sort(java.util.Comparator
+				.comparing((Lezione l) -> l.getInsegnamento().getAnno())
+				.thenComparing(Lezione::getGiorno)
+				.thenComparing(Lezione::getOraInizio));
+
+		return ordinate;
+	}
+
+	public List<Lezione> getOrarioPersonaleDocente(Docente docenteLoggato) {
+		List<Lezione> lezioniPersonali = new ArrayList<>();
+
+		for (Lezione l : orario.getLezioni()) {
+			if (l.getInsegnamento().getDocenteTitolare().equals(docenteLoggato)) {
+				lezioniPersonali.add(l);
+			}
+		}
+		return ordinaLezioni(lezioniPersonali);
 	}
 }
