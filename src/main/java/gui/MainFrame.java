@@ -5,11 +5,20 @@ import java.awt.*;
 import controller.Controller;
 import model.*;
 
+/**
+ * Finestra principale dell'applicazione (Boundary) che funge da contenitore (Hub) per tutte le altre viste.
+ * <p>
+ * Implementa un pattern di navigazione basato su {@link CardLayout}, permettendo di passare
+ * dinamicamente da un pannello all'altro senza aprire nuove finestre. Gestisce inoltre le
+ * autorizzazioni (Role-Based Access Control), mostrando o nascondendo le funzionalità in base
+ * al tipo di {@link Utente} che ha effettuato l'accesso.
+ * </p>
+ */
 public class MainFrame extends JFrame {
 
     // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
-    private JPanel mainPanel; // Il contenitore radice
-    private JPanel contentPanel; // Il pannello vuoto al centro in cui ruoteremo le carte
+    private JPanel mainPanel;
+    private JPanel contentPanel;
     private JButton btnOrario;
     private JButton btnCreaLezione;
     private JButton btnRisorse;
@@ -26,13 +35,26 @@ public class MainFrame extends JFrame {
     private StudenteOrarioPanel studenteOrarioPanel;
     private GestioneRisorsePanel gestioneRisorsePanel;
 
+    /** Identificativo testuale per il pannello dell'orario generale. */
     public static final String CARD_ORARIO       = "ORARIO";
+    /** Identificativo testuale per il pannello di creazione lezioni. */
     public static final String CARD_CREA_LEZIONE = "CREA_LEZIONE";
+    /** Identificativo testuale per il pannello di invio richieste. */
     public static final String CARD_INVIA_REQ    = "INVIA_REQ";
+    /** Identificativo testuale per il pannello di gestione delle richieste in sospeso. */
     public static final String CARD_GESTISCI_REQ = "GESTISCI_REQ";
+    /** Identificativo testuale per il pannello dell'orario specifico per lo studente. */
     public static final String CARD_STUDENTE     = "STUDENTE";
+    /** Identificativo testuale per il pannello di gestione aule e insegnamenti. */
     public static final String CARD_RISORSE      = "RISORSE";
 
+    /**
+     * Inizializza la finestra principale, carica i pannelli figli nel CardLayout e
+     * adegua l'interfaccia ai permessi dell'utente.
+     *
+     * @param controller    Il gestore centrale della logica di business.
+     * @param utenteLoggato L'utente (Studente, Docente o Responsabile) che ha superato il login.
+     */
     public MainFrame(Controller controller, Utente utenteLoggato) {
 
         // --- CONFIGURAZIONE FINESTRA BASE ---
@@ -40,15 +62,13 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
-
-        // Imposto il pannello disegnato graficamente come contenuto della finestra!
         setContentPane(mainPanel);
 
         // --- CONFIGURAZIONE CARD LAYOUT ---
         cardLayout = new CardLayout();
         contentPanel.setLayout(cardLayout);
 
-        // --- CORREZIONE: RICAVIAMO IL TIPO DI UTENTE ---
+        // --- RICAVIAMO IL TIPO DI UTENTE ---
         Docente docenteCorrente = null;
         if (utenteLoggato instanceof Docente) {
             docenteCorrente = (Docente) utenteLoggato;
@@ -63,13 +83,12 @@ public class MainFrame extends JFrame {
         orarioTablePanel       = new OrarioTablePanel(controller);
         orarioTablePanel.setUtenteLoggato(utenteLoggato);
         creaLezionePanel       = new CreaLezionePanel(controller, this);
-        // Ora docenteCorrente e studenteCorrente esistono e hanno il valore corretto!
         inviaRichiestaPanel    = new InviaRichiestaPanel(controller, docenteCorrente, this);
         gestisciRichiestePanel = new GestisciRichiestaPanel(controller, this);
         studenteOrarioPanel    = new StudenteOrarioPanel(controller, studenteCorrente);
         gestioneRisorsePanel   = new GestioneRisorsePanel(controller, this);
 
-        // Aggiungo i sotto-pannelli estraendo la loro vista grafica tramite getMainPanel()
+        // Aggiungo i sotto-pannelli al CardLayout
         contentPanel.add(orarioTablePanel.getMainPanel(),       CARD_ORARIO);
         contentPanel.add(creaLezionePanel.getMainPanel(),        CARD_CREA_LEZIONE);
         contentPanel.add(inviaRichiestaPanel.getMainPanel(),     CARD_INVIA_REQ);
@@ -85,12 +104,19 @@ public class MainFrame extends JFrame {
         btnInviaReq.addActionListener(e    -> showCard(CARD_INVIA_REQ));
         btnStudente.addActionListener(e    -> showCard(CARD_STUDENTE));
 
-        // Imposta i permessi e mostra la carta corretta in base a chi si è loggato
+        // Imposta i permessi
         impostaPermessi(utenteLoggato);
     }
 
-    // --- 3. I TUOI METODI DI UTILITA' INTATTI ---
+    // --- 3. I TUOI METODI DI UTILITA' ---
 
+    /**
+     * Mostra uno specifico pannello all'interno della finestra principale,
+     * nascondendo quello precedente e forzando l'aggiornamento dei dati (refresh)
+     * del pannello appena attivato.
+     *
+     * @param cardName L'identificativo costante (es. {@link #CARD_ORARIO}) del pannello da mostrare.
+     */
     public void showCard(String cardName) {
         cardLayout.show(contentPanel, cardName);
         switch (cardName) {
@@ -103,14 +129,34 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * Metodo statico di utilità per visualizzare rapidamente un popup di errore
+     * standardizzato in tutta l'applicazione.
+     *
+     * @param parent Il componente grafico padre su cui centrare il popup.
+     * @param msg    Il messaggio di errore da mostrare all'utente.
+     */
     public static void showError(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "Errore", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Metodo statico di utilità per visualizzare rapidamente un popup di successo
+     * standardizzato in tutta l'applicazione.
+     *
+     * @param parent Il componente grafico padre su cui centrare il popup.
+     * @param msg    Il messaggio di conferma da mostrare all'utente.
+     */
     public static void showSuccess(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "OK", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Configura la visibilità dei pulsanti nel menu laterale e stabilisce la schermata
+     * di partenza in base alla classe dell'utente (Studente, Docente o Responsabile).
+     *
+     * @param u L'utente attualmente autenticato le cui autorizzazioni devono essere verificate.
+     */
     public void impostaPermessi(Utente u) {
         // 1. Prima nascondiamo tutto a tutti
         btnCreaLezione.setVisible(false);

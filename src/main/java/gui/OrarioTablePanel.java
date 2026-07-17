@@ -7,6 +7,16 @@ import java.util.List;
 import controller.Controller;
 import model.*;
 
+/**
+ * Pannello dell'interfaccia grafica (Boundary) principale per la visualizzazione dell'orario.
+ * <p>
+ * Offre una tabella interattiva in cui le lezioni possono essere filtrate dinamicamente:
+ * in base a un anno di corso specifico, visualizzando tutte le lezioni, o mostrando solo
+ * l'orario personale (nel caso dei docenti). Inoltre, integra funzionalità di amministrazione
+ * avanzate: se l'utente loggato è un {@link Responsabile}, permette l'eliminazione
+ * delle lezioni tramite un menu contestuale (tasto destro del mouse).
+ * </p>
+ */
 public class OrarioTablePanel {
 
     // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
@@ -24,12 +34,22 @@ public class OrarioTablePanel {
             "Giorno", "Inizio", "Fine", "Insegnamento", "Anno", "Docente", "Aula"
     };
 
+    /**
+     * Inizializza il pannello dell'orario, popolando i filtri di ricerca e configurando
+     * il modello della tabella (non modificabile dall'utente).
+     * <p>
+     * Associa inoltre un {@link java.awt.event.MouseListener} alla tabella per gestire
+     * il menu a tendina (JPopupMenu) dedicato all'eliminazione delle lezioni.
+     * </p>
+     *
+     * @param controller Il gestore della logica di business.
+     */
     public OrarioTablePanel(Controller controller) {
         this.controller = controller;
 
         // --- INIZIALIZZAZIONE FILTRO A TENDINA ---
         filtroAnnoBox.addItem("Tutti");
-        filtroAnnoBox.addItem("Il mio orario"); // <-- NUOVA OPZIONE PER TUTTI
+        filtroAnnoBox.addItem("Il mio orario");
         for (AnnoCorso a : controller.getAnni()) {
             filtroAnnoBox.addItem(a.name());
         }
@@ -71,13 +91,20 @@ public class OrarioTablePanel {
         });
     }
 
-    // Viene chiamato dal MainFrame quando si apre la schermata
+    /**
+     * Associa l'utente attualmente autenticato a questa vista, adattando l'interfaccia
+     * di conseguenza.
+     * <p>
+     * Modifica il filtro predefinito all'avvio in base al ruolo: i Docenti partono dalla vista
+     * "Il mio orario", mentre gli altri partono dalla vista "Tutti".
+     * </p>
+     *
+     * @param u L'utente che ha effettuato l'accesso al sistema.
+     */
     public void setUtenteLoggato(Utente u) {
         this.utenteLoggato = u;
-        // Adesso la tendina è SEMPRE visibile, per qualsiasi ruolo!
         filtroAnnoBox.setVisible(true);
 
-        // Impostiamo di default la vista generale (o personale) all'avvio
         if (u instanceof Docente) {
             filtroAnnoBox.setSelectedItem("Il mio orario");
         } else {
@@ -87,7 +114,15 @@ public class OrarioTablePanel {
         refresh();
     }
 
-    // --- 3. METODO REFRESH LOGICO ---
+    /**
+     * Sincronizza la tabella grafica con i dati in memoria, applicando il filtro attualmente
+     * selezionato nel menu a tendina.
+     * <p>
+     * Prima di stampare le righe a video, la lista delle lezioni viene passata al
+     * metodo {@link Controller#ordinaLezioni(List)} per garantire un ordine cronologico
+     * corretto e leggibile.
+     * </p>
+     */
     public void refresh() {
         tableModel.setRowCount(0);
         String sel = (String) filtroAnnoBox.getSelectedItem();
@@ -96,33 +131,24 @@ public class OrarioTablePanel {
 
         List<Lezione> lezioniGrezze = new ArrayList<>();
 
-        // 1. Scegliamo quali lezioni pescare in base a cosa c'è scritto nella tendina
         if ("Tutti".equals(sel)) {
             lezioniGrezze = controller.getLezioni();
 
         } else if ("Il mio orario".equals(sel)) {
-            // Selezionato orario personale:
-            // Visto che sia Docente sia Responsabile ereditano da Docente (o lo sono nel DB), usiamo il loro profilo
             if (utenteLoggato instanceof Docente) {
                 lezioniGrezze = controller.getOrarioPersonaleDocente((Docente) utenteLoggato);
             } else {
-                // Se è uno Studente, supponendo che abbia un anno assegnato, puoi inserire
-                // qui la logica se hai un metodo tipo controller.getOrarioPersonaleStudente()
-                // Altrimenti lo avvisiamo di usare il filtro per Anno:
                 JOptionPane.showMessageDialog(mainPanel, "Usa i filtri dell'anno di corso per vedere il tuo orario.");
                 filtroAnnoBox.setSelectedItem("Tutti");
                 return;
             }
 
         } else {
-            // Se non è né "Tutti" né "Il mio orario", allora è un Anno di corso
             lezioniGrezze = controller.getLezioniPerAnno(AnnoCorso.valueOf(sel));
         }
 
-        // 2. Le ordiniamo perfettamente come abbiamo fatto prima
         lezioniAttuali = controller.ordinaLezioni(lezioniGrezze);
 
-        // 3. Le stampiamo a video
         for (Lezione l : lezioniAttuali) {
             tableModel.addRow(new Object[]{
                     l.getGiorno(),
@@ -136,6 +162,11 @@ public class OrarioTablePanel {
         }
     }
 
+    /**
+     * Restituisce il contenitore grafico principale di questo pannello.
+     *
+     * @return Il {@link JPanel} radice.
+     */
     public JPanel getMainPanel() {
         return mainPanel;
     }

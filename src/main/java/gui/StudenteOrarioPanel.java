@@ -6,6 +6,15 @@ import java.util.List;
 import controller.Controller;
 import model.*;
 
+/**
+ * Pannello dell'interfaccia grafica (Boundary) dedicato alla visualizzazione dell'orario
+ * lato {@link Studente}.
+ * <p>
+ * A differenza del pannello generale, questa schermata mostra esclusivamente
+ * le lezioni pertinenti all'anno di corso ({@link AnnoCorso}) dello studente loggato,
+ * nascondendo la colonna relativa all'anno (diventata superflua) per massimizzare la leggibilità.
+ * </p>
+ */
 public class StudenteOrarioPanel {
 
     // --- 1. COMPONENTI GESTITI DAL DESIGNER (.form) ---
@@ -21,6 +30,13 @@ public class StudenteOrarioPanel {
             "Giorno", "Inizio", "Fine", "Insegnamento", "Docente", "Aula"
     };
 
+    /**
+     * Inizializza il pannello dell'orario per lo studente, configurando la tabella
+     * con intestazioni semplificate e rendendola di sola lettura.
+     *
+     * @param controller Il gestore della logica di business.
+     * @param studente   Lo studente attualmente autenticato di cui estrarre l'orario.
+     */
     public StudenteOrarioPanel(Controller controller, Studente studente) {
         this.controller = controller;
         this.studente   = studente;
@@ -29,11 +45,13 @@ public class StudenteOrarioPanel {
         tableModel = new DefaultTableModel(COLONNE, 0) {
             public boolean isCellEditable(int r, int c) { return false; }
         };
-        // Assegno il modello alla tabella che hai disegnato graficamente
         table.setModel(tableModel);
     }
 
-    // --- 3. METODO REFRESH ---
+    /**
+     * Sincronizza la tabella grafica recuperando dal sistema le sole lezioni previste
+     * per l'anno accademico dello studente e popolando le righe.
+     */
     public void refresh() {
         tableModel.setRowCount(0);
         if (studente == null) return;
@@ -51,7 +69,11 @@ public class StudenteOrarioPanel {
         }
     }
 
-    // Metodo per recuperare la vista
+    /**
+     * Restituisce il contenitore grafico principale di questo pannello.
+     *
+     * @return Il {@link JPanel} radice generato dal GUI designer.
+     */
     public JPanel getMainPanel() {
         return mainPanel;
     }
